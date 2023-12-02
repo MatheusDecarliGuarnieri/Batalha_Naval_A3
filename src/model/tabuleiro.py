@@ -1,5 +1,5 @@
 from typing import List
-import json
+from src.model.pecas_batalha_naval import PecasBatalhaNaval
 
 class TabuleiroModel:
     def __init__(self):
@@ -11,25 +11,45 @@ class TabuleiroModel:
             'jogador1': [['~']*10 for _ in range(10)],
             'jogador2': [['~']*10 for _ in range(10)]
         }
-        self.embarcacao = {'A': 5, 'B': 4, 'S': 3, 'D': 3, 'P': 2}
-    
-    def colocar_embarcacao(self, jogador, tipo_embarcacao, linha, coluna, orientacao):
+        self.pecas_batalha_naval = PecasBatalhaNaval()
+
+    def colocar_embarcacao(self, jogador, nome_peca, linha, coluna, orientacao):
         tabuleiro = self.tabuleiros[jogador]
+        peca = self.pecas_batalha_naval.obter_peca(nome_peca)
+
+        if peca is None:
+            raise ValueError(f"Tipo de embarcação '{nome_peca}' não encontrado.")
 
         if not (0 <= linha < 10 and 0 <= coluna < 10):
             raise ValueError("Coordenadas inválidas.")
-        
-        for i in range(self.embarcacao[tipo_embarcacao]):
-            if orientacao == 'horizontal':
-                if coluna + i >= 10 or tabuleiro[linha][coluna + i] != '~':
-                    raise ValueError("Posição ocupada por outro navio.")
-                tabuleiro[linha][coluna + i] = tipo_embarcacao
-            elif orientacao == 'vertical':
-                if linha + i >= 10 or tabuleiro[linha + i][coluna] != '~':
-                    raise ValueError("Posição ocupada por outro navio.")
-                tabuleiro[linha + i][coluna] = tipo_embarcacao
+           
+        for i in range(len(peca)):
+            if nome_peca == 'PortaAvioes' and orientacao == 'horizontal':
+                # Adiciona a peça 'P' em formato de T para 'PortaAvioes'
+                tabuleiro[linha][coluna] = 'P1'
+                tabuleiro[linha][coluna + 1] = 'P2'
+                tabuleiro[linha ][coluna - 1] = 'P3'
+                tabuleiro[linha + 1][coluna] = 'P4'
+                tabuleiro[linha + 2][coluna] = 'P5'
             else:
-                raise ValueError("Orientação inválida.")
+                if orientacao == 'horizontal':
+                    if coluna + i >= 10 or tabuleiro[linha][coluna + i] != '~':
+                        raise ValueError("Posição ocupada por outro navio.")
+                    tabuleiro[linha][coluna + i] = peca[i]
+                                               
+            if nome_peca == 'PortaAvioes' and orientacao == 'vertical':
+                tabuleiro[linha][coluna] = 'P1'
+                tabuleiro[linha - 1][coluna] = 'P2'
+                tabuleiro[linha + 1][coluna] = 'P3'
+                tabuleiro[linha][coluna + 1] = 'P4'
+                tabuleiro[linha][coluna + 2] = 'P5'
+            else:    
+                if orientacao == 'vertical':
+                    if linha + i >= 10 or tabuleiro[linha + i][coluna] != '~':
+                        raise ValueError("Posição ocupada por outro navio.")
+                    tabuleiro[linha + i][coluna] = peca[i]
+                else:
+                    raise ValueError("Orientação inválida.")
 
     def verifica_posicao(self, linha, coluna):
         # Verifica se a posição está ocupada por uma peça
@@ -57,10 +77,20 @@ class TabuleiroModel:
 
     def obter_tabuleiro_fantasma(self, jogador) -> List[List[str]]:
         return self.tabuleiros_fantasma[jogador]
-
+        
 class TabuleiroView:
     @staticmethod
     def formatar_tabuleiro(tabuleiro: List[List[str]]) -> List[str]:
-        formatted_tabuleiro = [' '.join(linha) for linha in tabuleiro]
+        formatted_tabuleiro = []
+
+        for linha in tabuleiro:
+            formatted_linha = []
+            for item in linha:
+                if isinstance(item, list):
+                    # Se o item for uma lista, unimos seus elementos em uma string
+                    formatted_linha.append(' '.join(item))
+                else:
+                    formatted_linha.append(item)
+            formatted_tabuleiro.append(' '.join(formatted_linha))
+
         return formatted_tabuleiro
-        
