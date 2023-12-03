@@ -38,13 +38,3 @@ async def obter_tabuleiro_fantasma(jogador: str):
         )
     }
 
-@app.get("/")
-def read_root():
-    return{
-        "Hello": "World"
-    }
-
-@app.get("/tabuleiro_teste/{jogador}")
-def tabuleiro_teste(jogador):
-    return TabuleiroView.imprimir_tabuleiro(jogador)
-
