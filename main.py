@@ -1,41 +1,58 @@
 from fastapi import FastAPI, HTTPException
-from src.controller.tabuleiro_controller import TabuleiroController
-from src.view.tabuleiro_view import TabuleiroView
+from src.model.partida import Partida
 
 app = FastAPI()
-tabuleiro_controller = TabuleiroController()
+partida = Partida()
 
+@app.post("/entrar_na_fila/{jogador}")
+async def entrar_na_fila(jogador: str):
+    partida.entrar_na_fila(jogador)
+    return {"message": f"{jogador} entrou na fila."}
 
-@app.post("/colocar_embarcacao/{jogador}/{tipo_embarcacao}/{linha}/{coluna}/{orientacao}")
-async def colocar_embarcacao(
-    jogador: str, tipo_embarcacao: str, linha: int, coluna: int, orientacao: str
+@app.get("/verificar_partida/{jogador}")
+async def verificar_partida(jogador: str):
+    return partida.verificar_partida(jogador)
+
+@app.get("/ver_tabuleiro/{jogador}")
+async def ver_tabuleiro(jogador: str):
+    # Adicione lógica para verificar se o jogador está em uma partida
+    if jogador not in partida.fila_jogadores:
+        raise HTTPException(status_code=400, detail=f"{jogador} não está em uma partida.")
+
+    # Adicione mais lógica conforme necessário
+    tabuleiro = partida.obter_tabuleiro(jogador)
+    
+    return {"tabuleiro": tabuleiro}
+
+@app.get("/ver_tabuleiro_fantasma/{jogador}")
+async def ver_tabuleiro_fantasma(jogador: str):
+    # Adicione lógica para verificar se o jogador está em uma partida
+    if jogador not in partida.fila_jogadores:
+        raise HTTPException(status_code=400, detail=f"{jogador} não está em uma partida.")
+
+    # Adicione mais lógica conforme necessário
+    tabuleiro_fantasma = partida.obter_tabuleiro_fantasma(jogador)
+    
+    return {"tabuleiro_fantasma": tabuleiro_fantasma}
+
+@app.post("/colocar_peca/{jogador}/{nome_peca}/{linha}/{coluna}/{orientacao}")
+async def colocar_peca(
+    jogador: str, nome_peca: str, linha: int, coluna: int, orientacao: str
 ):
     try:
-        total_pecas_colocadas = tabuleiro_controller.colocar_embarcacao(jogador, tipo_embarcacao, linha, coluna, orientacao)
-        tabuleiro_controller.colocar_embarcacao(jogador, tipo_embarcacao, linha, coluna, orientacao)
-        return {"message": f"Embarcação colocada com sucesso para {jogador}! Total de Embarcações colocadas: {total_pecas_colocadas}"}
+        partida.colocar_peca(jogador, nome_peca, linha, coluna, orientacao)
+        return {"message": f"{jogador} colocou a peça {nome_peca}."}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
-@app.post("/disparo/{jogador}/{linha}/{coluna}")
+@app.post("/realizar_disparo/{jogador}/{linha}/{coluna}")
 async def realizar_disparo(jogador: str, linha: int, coluna: int):
     try:
-        mensagem = tabuleiro_controller.disparo(jogador, linha, coluna)
-        return {"message": f"{mensagem} para {jogador}!"}
+        partida.realizar_disparo(jogador, linha, coluna)
+        return {"message": f"{jogador} realizou um disparo."}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
-@app.get("/tabuleiro/{jogador}")
-async def obter_tabuleiro(jogador: str):
-    return {"tabuleiro": TabuleiroView.formatar_tabuleiro(tabuleiro_controller.obter_tabuleiro(jogador))}
-
-
-@app.get("/tabuleiro_fantasma/{jogador}")
-async def obter_tabuleiro_fantasma(jogador: str):
-    return {
-        "tabuleiro_fantasma": TabuleiroView.formatar_tabuleiro(tabuleiro_controller.obter_tabuleiro_fantasma(jogador)
-        )
-    }
-
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)

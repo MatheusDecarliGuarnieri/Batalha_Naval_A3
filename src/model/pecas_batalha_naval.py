@@ -1,5 +1,3 @@
-import json
-
 class PecasBatalhaNaval:
     def __init__(self):
         self.tipos_embarcacoes = {
@@ -32,9 +30,9 @@ class PecasBatalhaNaval:
                     tabuleiro[linha + 2][coluna] = 'P3'
                     tabuleiro[linha + 1][coluna + 1] = 'P4'
                     tabuleiro[linha + 1][coluna + 2] = 'P5'
-                    self.pecas_colocadas += 1
-                    print(f"Peca PortaAvioes adicionada. Total de peças: {self.pecas_colocadas}")
-                    break
+                self.pecas_colocadas += 1
+                print(f"Peca PortaAvioes adicionada. Total de peças: {self.pecas_colocadas}")
+                break
         
         elif orientacao == 'vertical':
             for i in range(3):
@@ -48,9 +46,9 @@ class PecasBatalhaNaval:
                     tabuleiro[linha][coluna + 2] = 'P3'
                     tabuleiro[linha + 1][coluna + 1] = 'P4'
                     tabuleiro[linha + 2][coluna + 1] = 'P5'
-                    self.pecas_colocadas += 1
-                    print(f"Peca PortaAvioes adicionada. Total de peças: {self.pecas_colocadas}")
-                    break
+                self.pecas_colocadas += 1
+                print(f"Peca PortaAvioes adicionada. Total de peças: {self.pecas_colocadas}")
+                break
         else:
             raise ValueError("Orientação inválida.")
 
@@ -95,9 +93,9 @@ class PecasBatalhaNaval:
                     raise ValueError("Fora do Tabuleiro.")
                 else:
                     tabuleiro[linha][coluna + i] = f'C{i+1}'
-                    self.pecas_colocadas += 1
-                    print(f"Peca Cruzador adicionada. Total de peças: {self.pecas_colocadas}")
-                    break
+                self.pecas_colocadas += 1
+                print(f"Peca Cruzador adicionada. Total de peças: {self.pecas_colocadas}")
+                break
         elif orientacao == 'vertical':
             for i in range(3):
                 if linha + i >= 10 or tabuleiro[linha + i][coluna] != '~':
@@ -106,9 +104,9 @@ class PecasBatalhaNaval:
                     raise ValueError("Fora do Tabuleiro.")
                 else:
                     tabuleiro[linha + i][coluna] = f'C{i+1}'
-                    self.pecas_colocadas += 1
-                    print(f"Peca Cruzador adicionada. Total de peças: {self.pecas_colocadas}")
-                    break
+                self.pecas_colocadas += 1
+                print(f"Peca Cruzador adicionada. Total de peças: {self.pecas_colocadas}")
+                break
         else:
             raise ValueError("Orientação inválida.")
 
@@ -116,29 +114,28 @@ class PecasBatalhaNaval:
         if self.pecas_colocadas >= self.max_pecas:
             print("Limite máximo de peças atingido.")
             return
-         
+        
+        if not (0 <= linha < len(tabuleiro) and 0 <= coluna < len(tabuleiro[0])):
+            raise ValueError("Fora do Tabuleiro.")
+        
         if orientacao == 'horizontal':
             for i in range(2):
                 if coluna + i >= 10 or tabuleiro[linha][coluna + i] != '~':
                     raise ValueError("Posição ocupada por outro navio.")
-                if not (0 <= linha < len(tabuleiro) and 0 <= coluna < len(tabuleiro[0])):
-                    raise ValueError("Fora do Tabuleiro.")
-                else:
+                for i in range(2):
                     tabuleiro[linha][coluna + i] = f'D{i+1}'
-                    self.pecas_colocadas += 1
-                    print(f"Peca Destroier adicionada. Total de peças: {self.pecas_colocadas}")
-                    break
+                self.pecas_colocadas += 1
+                print(f"Peca Destroier adicionada. Total de peças: {self.pecas_colocadas}")
+                break
         elif orientacao == 'vertical':
             for i in range(2):
                 if linha + i >= 10 or tabuleiro[linha + i][coluna] != '~':
                     raise ValueError("Posição ocupada por outro navio.")
-                if not (0 <= linha < len(tabuleiro) and 0 <= coluna < len(tabuleiro[0])):
-                    raise ValueError("Fora do Tabuleiro.")
-                else:
+                for i in range(2):
                     tabuleiro[linha + i][coluna] = f'D{i+1}'
-                    self.pecas_colocadas += 1
-                    print(f"Peca Destroier adicionada. Total de peças: {self.pecas_colocadas}")
-                    break
+                self.pecas_colocadas += 1
+                print(f"Peca Destroier adicionada.")
+                    
         else:
             raise ValueError("Orientação inválida.")
         
@@ -155,6 +152,6 @@ class PecasBatalhaNaval:
                 raise ValueError("Posição ocupada por outro navio.")
             else:
                 tabuleiro[linha][coluna + i] = f'S'
-                self.pecas_colocadas += 1
-                print(f"Peca Submarino adicionada. Total de peças: {self.pecas_colocadas}")
-                break
+            self.pecas_colocadas += 1
+            print(f"Peca Submarino adicionada. Total de peças: {self.pecas_colocadas}")
+            break
