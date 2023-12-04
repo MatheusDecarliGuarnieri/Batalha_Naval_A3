@@ -1,7 +1,7 @@
 from typing import List
 from src.model.pecas_batalha_naval import PecasBatalhaNaval
 
-class TabuleiroModel:
+class TabuleiroModel():
     def __init__(self):
         self.tabuleiros = {
             'jogador1': [['~']*10 for _ in range(10)],

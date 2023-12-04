@@ -1,10 +1,15 @@
 from fastapi import FastAPI, HTTPException
 from src.controller.tabuleirocontroller import TabuleiroController
 from src.view.tabuleiroview import TabuleiroView
+from src.controller.jogadorcontroller import JogadorController
+from src.model.partida import Partida
 
 app = FastAPI()
 tabuleiro_controller = TabuleiroController()
 
+jogador1 = "Bryan"
+jogador2 = "Matheus"
+Partida(jogador1,jogador2)
 
 @app.post("/colocar_embarcacao/{jogador}/{tipo_embarcacao}/{linha}/{coluna}/{orientacao}")
 async def colocar_embarcacao(
@@ -38,3 +43,6 @@ async def obter_tabuleiro_fantasma(jogador: str):
         )
     }
 
+@app.get("/")
+async def lista_jogadores():
+    return JogadorController.get_instance().lista_todos_os_jogadores()
