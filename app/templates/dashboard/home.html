@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <h1> Acesso autorizado <h1> 
+        <a href="/logouts/">Sair</a>
+        <a href="/password/">Mudar senha</a>
+    {%else%}
+        Acesso não autorizado
+    {%endif%}
+  
+{%endblock%}
