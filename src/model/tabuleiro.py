@@ -51,9 +51,9 @@ class TabuleiroModel:
                 else:
                     raise ValueError("Orientação inválida.")
 
-    def verifica_posicao(self, linha, coluna):
-        # Verifica se a posição está ocupada por uma peça
-        return self.tabuleiro[linha][coluna] != '~'
+    # def verifica_posicao(self, linha, coluna):
+    #     # Verifica se a posição está ocupada por uma peça
+    #     return self.tabuleiro[linha][coluna] != '~'
 
     def disparo(self, jogador, linha, coluna):
         tabuleiro = self.tabuleiros[jogador]
@@ -64,13 +64,14 @@ class TabuleiroModel:
             raise ValueError("Coordenadas inválidas.")
 
         # Verifica se o ataque acertou ou errou
-        if tabuleiro[linha][coluna] != ' ':
+        if tabuleiro[linha][coluna] != '~':
             tipo_embarcacao = tabuleiro[linha][coluna]
             tabuleiro_fantasma[linha][coluna] = 'X'  # Marcando o ataque bem-sucedido no tabuleiro fantasma
-            return f"Acertou o navio {tipo_embarcacao}!"
+            mensagem = f"Acertou o navio {tipo_embarcacao}!"
         else:
             tabuleiro_fantasma[linha][coluna] = 'O'  # Marcando a água no tabuleiro fantasma
-            return "Água!"
+            mensagem = "Água!"
+        return mensagem
         
     def obter_tabuleiro(self, jogador) -> List[List[str]]:
         return self.tabuleiros[jogador]
@@ -78,19 +79,3 @@ class TabuleiroModel:
     def obter_tabuleiro_fantasma(self, jogador) -> List[List[str]]:
         return self.tabuleiros_fantasma[jogador]
         
-class TabuleiroView:
-    @staticmethod
-    def formatar_tabuleiro(tabuleiro: List[List[str]]) -> List[str]:
-        formatted_tabuleiro = []
-
-        for linha in tabuleiro:
-            formatted_linha = []
-            for item in linha:
-                if isinstance(item, list):
-                    # Se o item for uma lista, unimos seus elementos em uma string
-                    formatted_linha.append(' '.join(item))
-                else:
-                    formatted_linha.append(item)
-            formatted_tabuleiro.append(' '.join(formatted_linha))
-
-        return formatted_tabuleiro
