@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from src.controller.tabuleirocontroller import TabuleiroController
-from src.view.tabuleiroview import TabuleiroView
+from src.controller.tabuleiro_controller import TabuleiroController
+from src.view.tabuleiro_view import TabuleiroView
 
 app = FastAPI()
 tabuleiro_controller = TabuleiroController()
@@ -11,8 +11,9 @@ async def colocar_embarcacao(
     jogador: str, tipo_embarcacao: str, linha: int, coluna: int, orientacao: str
 ):
     try:
+        total_pecas_colocadas = tabuleiro_controller.colocar_embarcacao(jogador, tipo_embarcacao, linha, coluna, orientacao)
         tabuleiro_controller.colocar_embarcacao(jogador, tipo_embarcacao, linha, coluna, orientacao)
-        return {"message": f"Embarcação colocada com sucesso para {jogador}!"}
+        return {"message": f"Embarcação colocada com sucesso para {jogador}! Total de Embarcações colocadas: {total_pecas_colocadas}"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

@@ -1,5 +1,5 @@
 from src.model.tabuleiro import TabuleiroModel
-from src.view.tabuleiroview import TabuleiroView
+from src.view.tabuleiro_view import TabuleiroView
 
 class TabuleiroController:
     def __init__(self):
