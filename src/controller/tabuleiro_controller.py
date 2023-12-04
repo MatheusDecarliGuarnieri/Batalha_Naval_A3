@@ -14,9 +14,6 @@ class TabuleiroController:
     
     def colocar_embarcacao(self, jogador, nome_peca, linha, coluna, orientacao):
         self.model.colocar_embarcacao(jogador, nome_peca, linha, coluna, orientacao)
-    
-    # def verifica_posicao(self, linha, coluna):
-    #     pass
 
     def disparo(self, jogador, linha, coluna):
         return self.model.disparo(jogador, linha, coluna)

@@ -1,5 +1,4 @@
 from typing import List, Tuple
-from fastapi import HTTPException
 from src.controller.tabuleiro_controller import TabuleiroController
 from src.view.tabuleiro_view import TabuleiroView
 
@@ -7,8 +6,13 @@ class Partida:
     def __init__(self):
         self.fila_jogadores = []  # Fila para controlar a entrada de jogadores
         self.jogadores_na_partida = set()  # Conjunto para controlar os jogadores na partida
-        self.tabuleiros = {}  # Dicionário para armazenar os tabuleiros dos jogadores
+        self.tabuleiros = {}
+        self.tabuleiros_fantasma = {}  # Dicionário para armazenar os tabuleiros dos jogadores
         self.partida_formada = False  # Atributo para rastrear se a partida foi formada
+        self.tabuleiro_controller = TabuleiroController()
+        self.tabuleiro_view = TabuleiroView()  # Instanciar o TabuleiroController
+        self.embarcacoes_colocadas = {jogador: 0 for jogador in ["jogador1", "jogador2"]}  # Rastrear número de embarcações colocadas
+        self.turno_atual = "jogador1"
 
     def entrar_na_fila(self, jogador):
         self.fila_jogadores.append(jogador)
@@ -28,6 +32,10 @@ class Partida:
             self.tabuleiros[jogador1] = [['~']*10 for _ in range(10)]
             self.tabuleiros[jogador2] = [['~']*10 for _ in range(10)]
 
+            # Inicialize os tabuleiros_fantasma para os jogadores
+            self.tabuleiros_fantasma[jogador1] = [['~']*10 for _ in range(10)]
+            self.tabuleiros_fantasma[jogador2] = [['~']*10 for _ in range(10)]
+
             self.partida_formada = True
             print(f"A partida foi formada entre {jogador1} e {jogador2}.")
 
@@ -39,48 +47,89 @@ class Partida:
         else:
             return {"message": f"{jogador}, a partida foi formada.", "partida_formada": self.partida_formada}
 
+    
     def obter_tabuleiro(self, jogador):
+        # Verifica se o jogador está na partida
+        if jogador not in self.jogadores_na_partida:
+            return None  # Se o jogador não estiver na partida, retorna None
+
+        return self.tabuleiros.get(jogador, None)
+    
+    def obter_tabuleiro_fantasma(self, jogador):
+        # Verifica se o jogador está na partida
+        if jogador not in self.jogadores_na_partida:
+            return None  # Se o jogador não estiver na partida, retorna None
+
         return self.tabuleiros.get(jogador, None)
 
-    def colocar_peca(self, jogador, nome_peca, linha, coluna, orientacao):
-        partida_atual = self.obter_partida_jogador(jogador)
+    def colocar_embarcacao(self, jogador, nome_peca, linha, coluna, orientacao):
+        if jogador not in self.jogadores_na_partida:
+            print(f"{jogador} não está na partida.")
+            return
 
-        if jogador != partida_atual['jogador_atual']:
-            raise ValueError("Não é a vez do jogador.")
+        if self.embarcacoes_colocadas[jogador] >= 8:
+            print(f"{jogador} já colocou todas as 8 embarcações.")
+            return
+        
+         # Obter o tabuleiro do jogador diretamente
+        tabuleiro_do_jogador = self.tabuleiros[jogador]
 
-        tabuleiro = partida_atual[jogador]['tabuleiro']
-        self.validar_coordenadas(linha, coluna)
+        # Utilizar o método do TabuleiroController
+        self.tabuleiro_controller.colocar_embarcacao(tabuleiro_do_jogador, nome_peca, linha, coluna, orientacao)
 
-        super().colocar_embarcacao(jogador, nome_peca, linha, coluna, orientacao)
-        partida_atual[jogador]['pecas_colocadas'] += 1
+        # Atualizar o tabuleiro com a peça escolhida
+        tabuleiro = self.tabuleiro_controller.obter_tabuleiro(jogador)
+        formatted_tabuleiro = self.tabuleiro_view.formatar_tabuleiro(tabuleiro)
+        print(f"Tabuleiro atualizado para {jogador}:\n{formatted_tabuleiro}")
 
-        if partida_atual[jogador]['pecas_colocadas'] == 8:
-            proximo_jogador = jogador if jogador != partida_atual['jogador_atual'] else self.obter_outro_jogador(jogador)
-            partida_atual['jogador_atual'] = proximo_jogador
-            print(f"{jogador} colocou todas as peças. Agora é a vez de {proximo_jogador}.")
+        self.embarcacoes_colocadas[jogador] += 1
+        print(f"{jogador} colocou {self.embarcacoes_colocadas[jogador]}/8 embarcações.")
+
+        # Se ambos jogadores colocaram 8 embarcações, inicie o turno
+        if all(embarcacoes == 8 for embarcacoes in self.embarcacoes_colocadas.values()):
+            self.iniciar_turno()
+
+    def iniciar_turno(self):
+        print("Ambos jogadores colocaram 8 embarcações. O turno está iniciando.")
+        
+        while not self.verificar_fim_partida():
+            jogador = self.turno_atual
+            print(f"\nTurno de {jogador}.")
+
+            # Mostrar o tabuleiro do jogador atual
+            print(f"Tabuleiro de {jogador}:")
+            self.mostrar_tabuleiro(jogador)
+
+            # Adicione lógica adicional para interação com os jogadores, como realizar disparos
+            linha = int(input(f"{jogador}, informe a linha do disparo: "))
+            coluna = int(input(f"{jogador}, informe a coluna do disparo: "))
+
+            # Realizar disparo
+            mensagem = self.realizar_disparo(jogador, linha, coluna)
+            print(mensagem)
+
+            # Trocar o turno
+            self.turno_atual = "jogador2" if jogador == "jogador1" else "jogador1"
 
     def realizar_disparo(self, jogador, linha, coluna):
-        partida_atual = self.obter_partida_jogador(jogador)
+        if jogador not in self.jogadores_na_partida:
+            print(f"{jogador} não está na partida.")
+            return "Jogador não está na partida."
 
-        if jogador != partida_atual['jogador_atual']:
-            raise ValueError("Não é a vez do jogador.")
+        if jogador != self.turno_atual:
+            print(f"Ainda não é o turno de {jogador}.")
+            return "Ainda não é o seu turno."
 
-        tabuleiro = partida_atual[jogador]['tabuleiro']
-        self.validar_coordenadas(linha, coluna)
+        # Utilizar o método do TabuleiroController
+        mensagem = self.tabuleiro_controller.disparo(self.tabuleiros[jogador], linha, coluna)
 
-        try:
-            super().disparo(jogador, linha, coluna)
-        except HTTPException as e:
-            raise HTTPException(status_code=e.status_code, detail=str(e))
+        # Adicione lógica adicional conforme necessário
+        # Por exemplo, verificar se o disparo acertou todas as peças do oponente para encerrar a partida
 
-        if "Acertou" not in mensagem:
-            proximo_jogador = self.obter_outro_jogador(jogador)
-            partida_atual['jogador_atual'] = proximo_jogador
-            print(f"Agora é a vez de {proximo_jogador}.")
+        # Trocar o turno
+        self.turno_atual = "jogador2" if jogador == "jogador1" else "jogador1"
 
-    def validar_coordenadas(self, linha, coluna):
-        if not (0 <= linha < 10 and 0 <= coluna < 10):
-            raise ValueError("Coordenadas inválidas.")
+        return mensagem
 
     def obter_outro_jogador(self, jogador):
         partida_atual = self.obter_partida_jogador(jogador)
