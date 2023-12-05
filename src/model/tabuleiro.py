@@ -3,18 +3,23 @@ from src.model.pecas_batalha_naval import PecasBatalhaNaval
 
 class TabuleiroModel:
     def __init__(self):
+         # Inicializa os tabuleiros para os jogadores
         self.tabuleiros = {
             'jogador1': [['~']*10 for _ in range(10)],
             'jogador2': [['~']*10 for _ in range(10)]
         }
+        # Inicializa os tabuleiros fantasma para os jogadores
         self.tabuleiros_fantasma = {
             'jogador1': [['~']*10 for _ in range(10)],
             'jogador2': [['~']*10 for _ in range(10)]
         }
+        # Instancia as peças do jogo
         self.pecas_batalha_naval = PecasBatalhaNaval()
 
     def colocar_embarcacao(self, jogador, nome_peca, linha, coluna, orientacao):
+        # Obtém o tabuleiro do jogador
         tabuleiro = self.tabuleiros[jogador]
+        # Obtém a peça correspondente ao nome
         peca = self.pecas_batalha_naval.obter_peca(nome_peca)
 
         if peca is None:
@@ -36,7 +41,8 @@ class TabuleiroModel:
             self.pecas_batalha_naval.adicionar_peca_submarino(tabuleiro, linha, coluna)
         else:
             raise ValueError("Tipo de embarcação desconhecido.")
-
+    
+    #Lógica para realizar um disparo no tabuleiro
     def disparo(self, jogador, linha, coluna):
         tabuleiro = self.tabuleiros[jogador]
         tabuleiro_fantasma = self.tabuleiros_fantasma[jogador]
@@ -54,10 +60,11 @@ class TabuleiroModel:
             tabuleiro_fantasma[linha][coluna] = 'O'  # Marcando a água no tabuleiro fantasma
             mensagem = "Água!"
         return mensagem
-        
+
+    #   Retorna Tabuleiro
     def obter_tabuleiro(self, jogador) -> List[List[str]]:
         return self.tabuleiros[jogador]
-
+    
+    #   Retorna Tabuleiro_Fantasma
     def obter_tabuleiro_fantasma(self, jogador) -> List[List[str]]:
         return self.tabuleiros_fantasma[jogador]
-        

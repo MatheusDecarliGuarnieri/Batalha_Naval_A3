@@ -1,5 +1,6 @@
 class PecasBatalhaNaval:
     def __init__(self):
+        # Dicionário de tipos de embarcações e suas representações
         self.tipos_embarcacoes = {
             'Submarino': ['S'] ,
             'Destroier': ['D1', 'D2'] ,
@@ -7,12 +8,15 @@ class PecasBatalhaNaval:
             'Encouracado': ['E1', 'E2', 'E3', 'E4'],
             'PortaAvioes': ['P1', 'P2', 'P3', 'P4', 'P5']
         }
+        # Contadores de peças colocadas e limite máximo de peças
         self.pecas_colocadas = 0
         self.max_pecas = 8
 
     def obter_peca(self, nome_peca):
+        # Obtém a representação da peça pelo nome
         return self.tipos_embarcacoes.get(nome_peca, None)
-
+    
+    # Adicione métodos para adicionar cada tipo de embarcação
     def adicionar_peca_portaavioes(self, tabuleiro, linha, coluna, orientacao):
         if self.pecas_colocadas >= self.max_pecas:
             print("Limite máximo de peças atingido.")
@@ -61,9 +65,9 @@ class PecasBatalhaNaval:
             raise ValueError("Fora do Tabuleiro.")
 
         if orientacao == 'horizontal':
-            # for i in range(4):
-            #     if coluna + i >= 10 or tabuleiro[linha][coluna + i] != '~':
-            #         raise ValueError("Posição ocupada por outro navio.")
+            for i in range(4):
+                if coluna + i >= 10 or tabuleiro[linha][coluna + i] != '~':
+                    raise ValueError("Posição ocupada por outro navio.")
             for i in range(4):
                 tabuleiro[linha][coluna + i] = f'E{i+1}'
             self.pecas_colocadas += 1

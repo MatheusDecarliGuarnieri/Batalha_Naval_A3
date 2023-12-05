@@ -1,20 +1,29 @@
-from typing import List, Tuple
 from src.controller.tabuleiro_controller import TabuleiroController
 from src.view.tabuleiro_view import TabuleiroView
 
 class Partida:
     def __init__(self):
-        self.fila_jogadores = []  # Fila para controlar a entrada de jogadores
-        self.jogadores_na_partida = set()  # Conjunto para controlar os jogadores na partida
+        # Fila para controlar a entrada de jogadores
+        self.fila_jogadores = []
+        # Conjunto para controlar os jogadores na partida
+        self.jogadores_na_partida = set()
+        # Dicionário para armazenar os tabuleiros dos jogadores
         self.tabuleiros = {}
-        self.tabuleiros_fantasma = {}  # Dicionário para armazenar os tabuleiros dos jogadores
-        self.partida_formada = False  # Atributo para rastrear se a partida foi formada
+        # Dicionário para armazenar os tabuleiros fantasma dos jogadores (oponente)
+        self.tabuleiros_fantasma = {}
+        # Atributo para rastrear se a partida foi formada
+        self.partida_formada = False
+        # Instanciar o TabuleiroController
         self.tabuleiro_controller = TabuleiroController()
-        self.tabuleiro_view = TabuleiroView()  # Instanciar o TabuleiroController
-        self.embarcacoes_colocadas = {jogador: 0 for jogador in ["jogador1", "jogador2"]}  # Rastrear número de embarcações colocadas
+        # Instanciar o TabuleiroView
+        self.tabuleiro_view = TabuleiroView()
+        # Rastrear número de embarcações colocadas por jogador
+        self.embarcacoes_colocadas = {jogador: 0 for jogador in ["jogador1", "jogador2"]}
+        # Rastrear o turno atual
         self.turno_atual = "jogador1"
 
     def entrar_na_fila(self, jogador):
+        # Adiciona o jogador à fila
         self.fila_jogadores.append(jogador)
         self.formar_partida()  # Verificar se a condição para formar a partida é atendida sempre que um jogador entra na fila
 
@@ -40,6 +49,7 @@ class Partida:
             print(f"A partida foi formada entre {jogador1} e {jogador2}.")
 
     def verificar_partida(self, jogador):
+        # Mostra se jogador está em uam fila, partida ou aguardando entrar numa fila
         if jogador not in self.fila_jogadores and jogador not in self.jogadores_na_partida:
             return {"message": f"{jogador} não está em uma partida.", "partida_formada": self.partida_formada}
         elif jogador in self.fila_jogadores:
@@ -61,6 +71,8 @@ class Partida:
             return None  # Se o jogador não estiver na partida, retorna None
 
         return self.tabuleiros.get(jogador, None)
+
+#============================================================= Problemas com implementação e uso so tabuleiro_controller problema relacionado a [List]
 
     def colocar_embarcacao(self, jogador, nome_peca, linha, coluna, orientacao):
         if jogador not in self.jogadores_na_partida:
@@ -135,3 +147,4 @@ class Partida:
         partida_atual = self.obter_partida_jogador(jogador)
         jogadores_partida = [j for j in partida_atual.keys() if j != 'jogador_atual']
         return jogadores_partida[0]
+    
