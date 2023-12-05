@@ -4,6 +4,7 @@ class TabuleiroView:
 
     @staticmethod
     def formatar_tabuleiro(tabuleiro: List[List[str]]) -> List[str]:
+        # Lógica para formatar o tabuleiro para exibição
         formatted_tabuleiro = []
 
         for linha in tabuleiro:

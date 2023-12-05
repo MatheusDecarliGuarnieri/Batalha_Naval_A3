@@ -3,18 +3,23 @@ from src.model.pecas_batalha_naval import PecasBatalhaNaval
 
 class TabuleiroModel:
     def __init__(self):
+         # Inicializa os tabuleiros para os jogadores
         self.tabuleiros = {
             'jogador1': [['~']*10 for _ in range(10)],
             'jogador2': [['~']*10 for _ in range(10)]
         }
+        # Inicializa os tabuleiros fantasma para os jogadores
         self.tabuleiros_fantasma = {
             'jogador1': [['~']*10 for _ in range(10)],
             'jogador2': [['~']*10 for _ in range(10)]
         }
+        # Instancia as peças do jogo
         self.pecas_batalha_naval = PecasBatalhaNaval()
 
     def colocar_embarcacao(self, jogador, nome_peca, linha, coluna, orientacao):
+        # Obtém o tabuleiro do jogador
         tabuleiro = self.tabuleiros[jogador]
+        # Obtém a peça correspondente ao nome
         peca = self.pecas_batalha_naval.obter_peca(nome_peca)
 
         if peca is None:
@@ -22,39 +27,22 @@ class TabuleiroModel:
 
         if not (0 <= linha < 10 and 0 <= coluna < 10):
             raise ValueError("Coordenadas inválidas.")
-           
-        for i in range(len(peca)):
-            if nome_peca == 'PortaAvioes' and orientacao == 'horizontal':
-                # Adiciona a peça 'P' em formato de T para 'PortaAvioes'
-                tabuleiro[linha][coluna] = 'P1'
-                tabuleiro[linha][coluna + 1] = 'P2'
-                tabuleiro[linha ][coluna - 1] = 'P3'
-                tabuleiro[linha + 1][coluna] = 'P4'
-                tabuleiro[linha + 2][coluna] = 'P5'
-            else:
-                if orientacao == 'horizontal':
-                    if coluna + i >= 10 or tabuleiro[linha][coluna + i] != '~':
-                        raise ValueError("Posição ocupada por outro navio.")
-                    tabuleiro[linha][coluna + i] = peca[i]
-                                               
-            if nome_peca == 'PortaAvioes' and orientacao == 'vertical':
-                tabuleiro[linha][coluna] = 'P1'
-                tabuleiro[linha - 1][coluna] = 'P2'
-                tabuleiro[linha + 1][coluna] = 'P3'
-                tabuleiro[linha][coluna + 1] = 'P4'
-                tabuleiro[linha][coluna + 2] = 'P5'
-            else:    
-                if orientacao == 'vertical':
-                    if linha + i >= 10 or tabuleiro[linha + i][coluna] != '~':
-                        raise ValueError("Posição ocupada por outro navio.")
-                    tabuleiro[linha + i][coluna] = peca[i]
-                else:
-                    raise ValueError("Orientação inválida.")
 
-    # def verifica_posicao(self, linha, coluna):
-    #     # Verifica se a posição está ocupada por uma peça
-    #     return self.tabuleiro[linha][coluna] != '~'
-
+        # Chama o método correspondente na classe PecasBatalhaNaval
+        if nome_peca == 'PortaAvioes':
+            self.pecas_batalha_naval.adicionar_peca_portaavioes(tabuleiro, linha, coluna, orientacao)
+        elif nome_peca == 'Encouracado':
+            self.pecas_batalha_naval.adicionar_peca_encouracado(tabuleiro, linha, coluna, orientacao)
+        elif nome_peca == 'Cruzador':
+            self.pecas_batalha_naval.adicionar_peca_cruzador(tabuleiro, linha, coluna, orientacao)
+        elif nome_peca == 'Destroier':
+            self.pecas_batalha_naval.adicionar_peca_destroier(tabuleiro, linha, coluna, orientacao)
+        elif nome_peca == 'Submarino':
+            self.pecas_batalha_naval.adicionar_peca_submarino(tabuleiro, linha, coluna)
+        else:
+            raise ValueError("Tipo de embarcação desconhecido.")
+    
+    #Lógica para realizar um disparo no tabuleiro
     def disparo(self, jogador, linha, coluna):
         tabuleiro = self.tabuleiros[jogador]
         tabuleiro_fantasma = self.tabuleiros_fantasma[jogador]
@@ -72,10 +60,11 @@ class TabuleiroModel:
             tabuleiro_fantasma[linha][coluna] = 'O'  # Marcando a água no tabuleiro fantasma
             mensagem = "Água!"
         return mensagem
-        
+
+    #   Retorna Tabuleiro
     def obter_tabuleiro(self, jogador) -> List[List[str]]:
         return self.tabuleiros[jogador]
-
+    
+    #   Retorna Tabuleiro_Fantasma
     def obter_tabuleiro_fantasma(self, jogador) -> List[List[str]]:
         return self.tabuleiros_fantasma[jogador]
-        
